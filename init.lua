@@ -170,8 +170,29 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
 -- Git keymaps
-vim.keymap.set('n', '<leader>gs', '<cmd>leftabove vertical terminal git status<cr>', { desc = 'Git status' })
-vim.keymap.set('n', '<leader>gl', '<cmd>leftabove vertical terminal git --no-pager log --all --graph --oneline --decorate<cr>', { desc = 'Git log' })
+
+-- Runs `git` with the given sub-command in a vertical split.
+-- Will additionally set buffer options to make it automatically
+-- be deleted when hidden, and make it not listed in the buffer list.
+-- And will set the key map `q` to quit the buffer
+local function run_git(sub_cmd)
+  vim.cmd('leftabove vertical terminal git --no-pager ' .. sub_cmd)
+  vim.bo.bufhidden = 'delete'
+  vim.bo.buflisted = false
+  vim.keymap.set('n', 'q', '<cmd>q<cr>', { buffer = true })
+end
+vim.keymap.set('n', '<leader>gs', function()
+  run_git 'status'
+end, { desc = 'Git [s]tatus' })
+vim.keymap.set('n', '<leader>gl', function()
+  run_git 'log --all --graph --oneline --decorate'
+end, { desc = 'Git [l]og' })
+vim.keymap.set('n', '<leader>gD', function()
+  run_git 'diff'
+end, { desc = 'Git [D]iff (all files)' })
+vim.keymap.set('n', '<leader>gd', function()
+  run_git 'diff %'
+end, { desc = 'Git [d]iff (current file)' })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
