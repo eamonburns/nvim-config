@@ -91,6 +91,7 @@ return {
           --  This is where a variable was first declared, or where a function is defined, etc.
           --  To jump back, press <C-t>.
           map("grd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
+          require("training-wheels").map("gd", "grd")
 
           -- WARN: This is not Goto Definition, this is Goto Declaration.
           --  For example, in C this would take you to the header.
@@ -108,6 +109,7 @@ return {
           --  Useful when you're not sure what type a variable is and you want to see
           --  the definition of its *type*, not where it was *defined*.
           map("grt", require("telescope.builtin").lsp_type_definitions, "[G]oto [T]ype Definition")
+          require("training-wheels").map("gt", "grt")
 
           -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
           ---@param client vim.lsp.Client
