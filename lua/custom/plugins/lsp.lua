@@ -227,6 +227,16 @@ return {
             },
           },
         },
+
+        harper_ls = {
+          settings = {
+            ["harper-ls"] = {
+              codeActions = {
+                ForceStable = true,
+              },
+            },
+          },
+        },
       }
 
       for server, config in pairs(servers) do
