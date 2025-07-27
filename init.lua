@@ -143,6 +143,9 @@ require("lazy").setup("custom.plugins", {
       lazy = "💤 ",
     },
   },
+  dev = {
+    path = "~/projects/lua/neovim/",
+  },
 })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
