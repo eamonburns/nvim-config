@@ -62,6 +62,12 @@ return { -- Collection of various small independent plugins/modules
       return "%2l:%-2v"
     end
 
+    require("mini.icons").setup {
+      filetype = {
+        autohotkey = { glyph = "", hl = "MiniIconsGreen" },
+      },
+    }
+
     -- ... and there is more!
     --  Check out: https://github.com/echasnovski/mini.nvim
   end,
