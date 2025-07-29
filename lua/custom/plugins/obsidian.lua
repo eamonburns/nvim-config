@@ -1,5 +1,9 @@
+local _, local_opts = pcall(require, "custom.plugins.local.obsidian")
+local_opts = local_opts or {}
+
 return {
   "epwalsh/obsidian.nvim",
+  enabled = vim.env.NVIM_OBSIDIAN == "1",
   version = "*",
   lazy = true,
   ft = "markdown",
@@ -8,7 +12,7 @@ return {
     "nvim-telescope/telescope.nvim",
   },
   opts = {
-    workspaces = require("custom.plugins.local.obsidian").workspaces,
+    workspaces = local_opts.workspaces,
     follow_url_func = vim.ui.open,
     follow_img_func = vim.ui.open,
 

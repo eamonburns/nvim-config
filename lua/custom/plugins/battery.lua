@@ -1,5 +1,5 @@
 return {
   "agent-e11/battery.nvim",
   opts = {},
-  dev = true,
+  dev = vim.env.NVIM_DEV == "1",
 }
