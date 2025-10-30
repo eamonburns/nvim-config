@@ -23,9 +23,9 @@ function M.map(discouraged, preferred, behavior, mode)
     print("Training wheels: You probably meant `" .. preferred .. "` instead of `" .. discouraged .. "`")
 
     if behavior == "passthrough" then
-      vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(discouraged, true, true, true), vim.fn.mode(), false)
+      nvim.feedkeys(vim.api.nvim_replace_termcodes(discouraged, true, true, true), vim.fn.mode(), false)
     elseif behavior == "replace" then
-      vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(preferred, true, true, true), vim.fn.mode(), false)
+      nvim.feedkeys(vim.api.nvim_replace_termcodes(preferred, true, true, true), vim.fn.mode(), false)
     end
   end, {
     desc = "Training Wheels: Prefer `" .. preferred .. "` over `" .. discouraged .. "`",

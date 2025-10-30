@@ -1,3 +1,12 @@
+-- `nvim` helper table for calling Neovim API functions
+
+---@diagnostic disable-next-line: lowercase-global
+nvim = setmetatable({}, {
+  __index = function(_, func)
+    return vim.api["nvim_" .. func]
+  end,
+})
+
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
@@ -80,6 +89,9 @@ if vim.fn.has("win32") == 1 then
   else
     vim.o.shell = "powershell.exe"
   end
+  vim.o.shellcmdflag = "-NoLogo -NoProfile -Command"
+  vim.o.shellquote = ""
+  vim.o.shellxquote = ""
 end
 
 -- [[ Basic Keymaps ]]
@@ -91,18 +103,18 @@ require("custom.keymaps")
 -- Highlight when yanking (copying) text
 --  Try it with `yap` in normal mode
 --  See `:help vim.hl.on_yank()`
-vim.api.nvim_create_autocmd("TextYankPost", {
+nvim.create_autocmd("TextYankPost", {
   desc = "Highlight when yanking (copying) text",
-  group = vim.api.nvim_create_augroup("kickstart-highlight-yank", { clear = true }),
+  group = nvim.create_augroup("kickstart-highlight-yank", { clear = true }),
   callback = function()
     vim.hl.on_yank()
   end,
 })
 
-vim.api.nvim_create_autocmd("FileType", {
+nvim.create_autocmd("FileType", {
   pattern = "checkhealth",
   desc = "Automatically delete checkhealth buffers when hidden",
-  group = vim.api.nvim_create_augroup("kickstart-autodelete-checkhealth", { clear = true }),
+  group = nvim.create_augroup("kickstart-autodelete-checkhealth", { clear = true }),
   callback = function()
     vim.bo.bufhidden = "delete"
   end,

@@ -2,39 +2,40 @@ local install_dir = vim.fn.stdpath("data") .. "/site"
 return {
   {
     "lewis6991/ts-install.nvim",
-    opts = {
-      auto_install = true,
-      install_dir = install_dir,
-      parsers = {
-        -- Custom parsers
-        supermd = {
-          install_info = {
-            url = "https://github.com/kristoff-it/supermd",
-            location = "tree-sitter/supermd",
-            files = {
-              "src/parser.c",
-              "src/scanner.c",
-            },
-            branch = "main",
-            queries_dir = "tree-sitter/supermd/queries",
-          },
-        },
-        supermd_inline = {
-          install_info = {
-            url = "https://github.com/kristoff-it/supermd",
-            location = "tree-sitter/supermd-inline",
-            files = {
-              "src/parser.c",
-              "src/scanner.c",
-            },
-            branch = "main",
-            queries_dir = "tree-sitter/supermd-inline/queries",
-          },
-        },
-      },
-    },
+    enabled = false,
     dependencies = { "nvim-treesitter/nvim-treesitter" },
-    init = function()
+    config = function()
+      require("ts-install").setup {
+        auto_install = true,
+        install_dir = install_dir,
+        parsers = {
+          -- Custom parsers
+          supermd = {
+            install_info = {
+              url = "https://github.com/kristoff-it/supermd",
+              location = "tree-sitter/supermd",
+              files = {
+                "src/parser.c",
+                "src/scanner.c",
+              },
+              branch = "main",
+              queries_dir = "tree-sitter/supermd/queries",
+            },
+          },
+          supermd_inline = {
+            install_info = {
+              url = "https://github.com/kristoff-it/supermd",
+              location = "tree-sitter/supermd-inline",
+              files = {
+                "src/parser.c",
+                "src/scanner.c",
+              },
+              branch = "main",
+              queries_dir = "tree-sitter/supermd-inline/queries",
+            },
+          },
+        },
+      }
       local function ts_start(bufnr, parser_name)
         vim.treesitter.start(bufnr, parser_name)
         -- Use regex based syntax-highlighting as fallback as some plugins might need it
@@ -49,9 +50,9 @@ return {
       end
 
       -- Auto-start parsers for any buffer
-      vim.api.nvim_create_autocmd("FileType", {
+      nvim.create_autocmd("FileType", {
         desc = "Enable Treesitter automatically",
-        group = vim.api.nvim_create_augroup("treesitter_autostart", {}),
+        group = nvim.create_augroup("treesitter_autostart", {}),
         callback = function(event)
           local bufnr = event.buf
           local filetype = vim.bo[bufnr].filetype

@@ -59,8 +59,8 @@ return {
       --    That is to say, every time a new file is opened that is associated with
       --    an lsp (for example, opening `main.rs` is associated with `rust_analyzer`) this
       --    function will be executed to configure the current buffer
-      vim.api.nvim_create_autocmd("LspAttach", {
-        group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
+      nvim.create_autocmd("LspAttach", {
+        group = nvim.create_augroup("kickstart-lsp-attach", { clear = true }),
         callback = function(event)
           -- NOTE: Remember that Lua is a real programming language, and as such it is possible
           -- to define small helper and utility functions so you don't have to repeat yourself.
@@ -120,6 +120,7 @@ return {
             if vim.fn.has("nvim-0.11") == 1 then
               return client:supports_method(method, bufnr)
             else
+              ---@diagnostic disable-next-line: param-type-mismatch
               return client.supports_method(method, { bufnr = bufnr })
             end
           end
@@ -131,24 +132,24 @@ return {
           -- When you move your cursor, the highlights will be cleared (the second autocommand).
           local client = vim.lsp.get_client_by_id(event.data.client_id)
           if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf) then
-            local highlight_augroup = vim.api.nvim_create_augroup("kickstart-lsp-highlight", { clear = false })
-            vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
+            local highlight_augroup = nvim.create_augroup("kickstart-lsp-highlight", { clear = false })
+            nvim.create_autocmd({ "CursorHold", "CursorHoldI" }, {
               buffer = event.buf,
               group = highlight_augroup,
               callback = vim.lsp.buf.document_highlight,
             })
 
-            vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+            nvim.create_autocmd({ "CursorMoved", "CursorMovedI" }, {
               buffer = event.buf,
               group = highlight_augroup,
               callback = vim.lsp.buf.clear_references,
             })
 
-            vim.api.nvim_create_autocmd("LspDetach", {
-              group = vim.api.nvim_create_augroup("kickstart-lsp-detach", { clear = true }),
+            nvim.create_autocmd("LspDetach", {
+              group = nvim.create_augroup("kickstart-lsp-detach", { clear = true }),
               callback = function(event2)
                 vim.lsp.buf.clear_references()
-                vim.api.nvim_clear_autocmds { group = "kickstart-lsp-highlight", buffer = event2.buf }
+                nvim.clear_autocmds { group = "kickstart-lsp-highlight", buffer = event2.buf }
               end,
             })
           end
