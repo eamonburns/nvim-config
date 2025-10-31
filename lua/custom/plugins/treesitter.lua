@@ -4,7 +4,7 @@ return {
   branch = "main",
   build = ":TSUpdate",
 
-  -- TODO: Add custom parsers
+  -- TODO: Add custom parsers: https://github.com/nvim-treesitter/nvim-treesitter/tree/main?tab=readme-ov-file#adding-custom-languages
 
   --         -- Custom parsers
   --         supermd = {
@@ -36,24 +36,28 @@ return {
   --       vim.filetype.add { extension = { smd = "supermd" } }
 
   init = function()
+    -- TODO: Ensure commands are installed (e.g. tree-sitter, curl?)
+
     -- Automatically download parser for current file if available and not already installed
     vim.api.nvim_create_autocmd("FileType", {
       group = vim.api.nvim_create_augroup("treesitter_autostart", { clear = true }),
       callback = function(args)
         local treesitter = require("nvim-treesitter")
         local lang = vim.treesitter.language.get_lang(args.match)
-        if vim.list_contains(treesitter.get_available(), lang) then
+
+        if lang and vim.list_contains(treesitter.get_available(), lang) then
           if not vim.list_contains(treesitter.get_installed(), lang) then
-            -- TODO: Make this not block the entire interface.
-            -- Currently, if a parser takes a long time to install (e.g. gitcommit takes a long time to compile),
-            -- the UI will be blank for that long. Neovim should be usable while the parser is installing, and
-            -- then treesitter should be started afterward
-            treesitter.install(lang):wait()
+            -- Install parser and then start treesitter
+            treesitter.install(lang):await(function()
+              vim.treesitter.start(args.buf)
+            end)
+          else
+            -- Start treesitter
+            vim.treesitter.start(args.buf)
           end
-          vim.treesitter.start(args.buf)
         end
       end,
-      desc = "Enable nvim-treesitter and install parser if not installed",
+      desc = "Automatically start treesitter for buffer (installing parser if not already)",
     })
   end,
 }
