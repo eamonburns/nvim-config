@@ -1,5 +1,9 @@
 # kickstart.nvim
 
+> [!NOTE]
+> This is a rewrite of my configuration, making use of Neovim 0.12 features such as `vim.pack`.
+> So, the following description is probably irrelevant.
+
 ## Introduction
 
 A starting point for Neovim that is:
