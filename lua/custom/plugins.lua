@@ -35,8 +35,10 @@ local plugins = {
 }
 
 local lsp_plugins = require("custom.plugins.lsp")
-
 plugins = vim.list_extend(plugins, lsp_plugins.plugins)
+
+local treesitter_plugins = require("custom.plugins.treesitter")
+plugins = vim.list_extend(plugins, treesitter_plugins.plugins)
 
 -- [[ Install plugins ]]
 vim.pack.add(plugins)
@@ -44,15 +46,18 @@ vim.pack.add(plugins)
 -- [[ Configure plugins ]]
 
 -- folke/tokyonight.nvim --
-require("tokyonight").setup({
+require("tokyonight").setup {
   styles = {
     comments = { italic = false }, -- Disable italics in comments
   },
-})
+}
 vim.cmd.colorscheme("tokyonight-night")
 
 -- LSP Plugins --
 lsp_plugins.configure()
+
+-- Treesitter Plugins --
+treesitter_plugins.configure()
 
 -- oil.nvim --
 require("oil").setup {
@@ -64,13 +69,13 @@ require("oil").setup {
 vim.keymap.set("n", "-", "<cmd>Oil<cr>")
 
 -- battery.nvim --
-require("battery").setup({})
+require("battery").setup {}
 
 -- mini.nvim --
-require("mini.tabline").setup({})
+require("mini.tabline").setup {}
 
 local statusline = require("mini.statusline")
-statusline.setup({
+statusline.setup {
   content = {
     active = function()
       local mode, mode_hl = MiniStatusline.section_mode { trunc_width = 120 }
@@ -97,7 +102,7 @@ statusline.setup({
     end,
   },
   use_icons = vim.g.have_nerd_font,
-})
+}
 
 ---@diagnostic disable-next-line: duplicate-set-field
 statusline.section_location = function()
@@ -105,7 +110,7 @@ statusline.section_location = function()
 end
 
 -- gitsigns.nvim --
-require("gitsigns").setup({
+require("gitsigns").setup {
   signs = {
     add = { text = "+" },
     change = { text = "~" },
@@ -113,9 +118,12 @@ require("gitsigns").setup({
     topdelete = { text = "‾" },
     changedelete = { text = "~" },
   },
-})
+}
 
 -- todo-comments.nvim --
-require("todo-comments").setup({
+require("todo-comments").setup {
   signs = false,
-})
+}
+
+-- nvim-autopairs --
+require("nvim-autopairs").setup {}
