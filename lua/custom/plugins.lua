@@ -20,6 +20,7 @@ local plugins = {
   gh("nvim-lua/plenary.nvim"),
 
   gh("folke/tokyonight.nvim"),
+  gh("navarasu/onedark.nvim"),
 
   gh("stevearc/oil.nvim"), -- Requires "nvim-tree/nvim-web-devicons"
 
@@ -45,13 +46,20 @@ vim.pack.add(plugins)
 
 -- [[ Configure plugins ]]
 
--- folke/tokyonight.nvim --
+-- tokyonight.nvim --
 require("tokyonight").setup {
   styles = {
     comments = { italic = false }, -- Disable italics in comments
   },
 }
-vim.cmd.colorscheme("tokyonight-night")
+
+-- onedark.nvim --
+require("onedark").setup({
+  style = "darker",
+})
+
+-- Colorscheme --
+vim.cmd.colorscheme("onedark")
 
 -- LSP Plugins --
 lsp_plugins.configure()
