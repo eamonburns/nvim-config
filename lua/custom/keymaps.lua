@@ -10,10 +10,11 @@ vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagn
 
 -- Git keymaps
 
--- Runs `git` with the given sub-command in a vertical split.
--- Will additionally set buffer options to make it automatically
--- be deleted when hidden, and make it not listed in the buffer list.
--- And will set the key map `q` to quit the buffer
+---Runs `git` with the given sub-command in a vertical split.
+---Will additionally set buffer options to make it automatically
+---be deleted when hidden, and make it not listed in the buffer list.
+---And will set the key map `q` to quit the buffer
+---@param sub_cmd string # Sub-command of `git` to run
 local function run_git(sub_cmd)
   vim.cmd("leftabove vertical terminal git --no-pager " .. sub_cmd)
   vim.bo.bufhidden = "delete"
