@@ -10,7 +10,7 @@ local plugins = {
     data = {
       on_change = function()
         vim.cmd["TSUpdate"]()
-      end
+      end,
     },
   },
 }
