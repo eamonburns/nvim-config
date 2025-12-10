@@ -73,13 +73,25 @@ vim.o.scrolloff = 3
 -- See `:help 'confirm'`
 vim.o.confirm = true
 
--- Set default shell
+-- Set shell settings for Windows
 if vim.fn.has("win32") == 1 then
+  vim.o.shelltemp = false
+  local shellcmdflag = "-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command "
+  shellcmdflag = shellcmdflag .. "[Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.UTF8Encoding]::new();"
+  shellcmdflag = shellcmdflag .. "$PSDefaultParameterValues['Out-File:Encoding']='utf8';"
+  vim.o.shellpipe = "> %s 2>&1"
+  vim.o.shellquote = ""
+  vim.o.shellxquote = ""
+
   if vim.fn.executable("pwsh.exe") == 1 then
     vim.o.shell = "pwsh.exe"
+    shellcmdflag = shellcmdflag .. "$PSStyle.OutputRendering = 'PlainText';"
+    -- This might be unnecessary
+    vim.env.__SuppressAnsiEscapeSequences = "1"
   else
     vim.o.shell = "powershell.exe"
   end
+  vim.o.shellcmdflag = shellcmdflag
 end
 
 -- [[ Basic Keymaps ]]
@@ -147,6 +159,9 @@ require("lazy").setup("custom.plugins", {
     path = "~/projects/lua/neovim/",
   },
 })
+
+-- Prepend to packpath (must be after lazy setup)
+vim.cmd("set packpath^=~/AppData/Local/nvim-data/site")
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
