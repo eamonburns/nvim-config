@@ -28,6 +28,8 @@ local configure = function()
     library = {
       -- Load luvit types when the `vim.uv` word is found
       { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+      { path = "${3rd}/busted/library", words = { "describe" } },
+      { path = "${3rd}/luassert/library", words = { "describe" } },
     },
   })
 
@@ -91,7 +93,7 @@ local configure = function()
           group = vim.api.nvim_create_augroup("kickstart-lsp-detach", { clear = true }),
           callback = function(event2)
             vim.lsp.buf.clear_references()
-            vim.api.nvim_clear_autocmds { group = "kickstart-lsp-highlight", buffer = event2.buf }
+            vim.api.nvim_clear_autocmds({ group = "kickstart-lsp-highlight", buffer = event2.buf })
           end,
         })
       end
@@ -102,12 +104,11 @@ local configure = function()
       -- This may be unwanted, since they displace some of your code
       if client and client_supports_method(client, "textDocument/inlayHint", event.buf) then
         map("<leader>th", function()
-          vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
+          vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }))
         end, "[T]oggle Inlay [H]ints")
       end
     end,
   })
-
 
   -- Diagnostic Config
   -- See :help vim.diagnostic.Opts
