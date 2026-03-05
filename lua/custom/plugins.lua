@@ -23,6 +23,7 @@ local plugins = {
   gh("navarasu/onedark.nvim"),
 
   gh("stevearc/oil.nvim"), -- Requires "nvim-tree/nvim-web-devicons"
+  gh("malewicz1337/oil-git.nvim"),
 
   gh("agent-e11/battery.nvim"), -- Requires "nvim-lua/plenary.nvim"
 
@@ -47,11 +48,11 @@ vim.pack.add(plugins)
 -- [[ Configure plugins ]]
 
 -- tokyonight.nvim --
-require("tokyonight").setup {
+require("tokyonight").setup({
   styles = {
     comments = { italic = false }, -- Disable italics in comments
   },
-}
+})
 
 -- onedark.nvim --
 require("onedark").setup({
@@ -68,35 +69,36 @@ lsp_plugins.configure()
 treesitter_plugins.configure()
 
 -- oil.nvim --
-require("oil").setup {
+require("oil").setup({
   default_file_explorer = true,
   view_options = {
     show_hidden = true,
   },
-}
+})
 vim.keymap.set("n", "-", "<cmd>Oil<cr>")
+require("oil-git").setup({})
 
 -- battery.nvim --
-require("battery").setup {}
+require("battery").setup({})
 
 -- mini.nvim --
-require("mini.tabline").setup {}
+require("mini.tabline").setup({})
 
 local statusline = require("mini.statusline")
-statusline.setup {
+statusline.setup({
   content = {
     active = function()
-      local mode, mode_hl = MiniStatusline.section_mode { trunc_width = 120 }
-      local git = MiniStatusline.section_git { trunc_width = 40 }
-      local diff = MiniStatusline.section_diff { trunc_width = 75 }
-      local diagnostics = MiniStatusline.section_diagnostics { trunc_width = 75 }
-      local lsp = MiniStatusline.section_lsp { trunc_width = 75 }
-      local filename = MiniStatusline.section_filename { trunc_width = 140 }
-      local fileinfo = MiniStatusline.section_fileinfo { trunc_width = 120 }
-      local location = MiniStatusline.section_location { trunc_width = 75 }
-      local search = MiniStatusline.section_searchcount { trunc_width = 75 }
+      local mode, mode_hl = MiniStatusline.section_mode({ trunc_width = 120 })
+      local git = MiniStatusline.section_git({ trunc_width = 40 })
+      local diff = MiniStatusline.section_diff({ trunc_width = 75 })
+      local diagnostics = MiniStatusline.section_diagnostics({ trunc_width = 75 })
+      local lsp = MiniStatusline.section_lsp({ trunc_width = 75 })
+      local filename = MiniStatusline.section_filename({ trunc_width = 140 })
+      local fileinfo = MiniStatusline.section_fileinfo({ trunc_width = 120 })
+      local location = MiniStatusline.section_location({ trunc_width = 75 })
+      local search = MiniStatusline.section_searchcount({ trunc_width = 75 })
 
-      return MiniStatusline.combine_groups {
+      return MiniStatusline.combine_groups({
         { hl = mode_hl, strings = { mode } },
         { hl = "MiniStatuslineDevinfo", strings = { git, diff, diagnostics, lsp } },
         "%<", -- Mark general truncate point
@@ -106,11 +108,11 @@ statusline.setup {
         -- TODO: Find out if there is a way to simply add a sub-section to this group (i.e. the "battery" section),
         -- instead of needing to re-implement this whole function
         { hl = mode_hl, strings = { search, location, require("battery").get_status_line() } },
-      }
+      })
     end,
   },
   use_icons = vim.g.have_nerd_font,
-}
+})
 
 ---@diagnostic disable-next-line: duplicate-set-field
 statusline.section_location = function()
@@ -118,7 +120,7 @@ statusline.section_location = function()
 end
 
 -- gitsigns.nvim --
-require("gitsigns").setup {
+require("gitsigns").setup({
   signs = {
     add = { text = "+" },
     change = { text = "~" },
@@ -126,12 +128,12 @@ require("gitsigns").setup {
     topdelete = { text = "‾" },
     changedelete = { text = "~" },
   },
-}
+})
 
 -- todo-comments.nvim --
-require("todo-comments").setup {
+require("todo-comments").setup({
   signs = false,
-}
+})
 
 -- nvim-autopairs --
-require("nvim-autopairs").setup {}
+require("nvim-autopairs").setup({})
