@@ -835,7 +835,7 @@ do
     format_on_save = function(bufnr)
       -- You can specify filetypes to autoformat on save here:
       local enabled_filetypes = {
-        -- lua = true,
+        lua = true,
         -- python = true,
       }
       if enabled_filetypes[vim.bo[bufnr].filetype] then
@@ -909,6 +909,8 @@ do
       -- See `:help blink-cmp-config-keymap` for defining your own keymap
       preset = "default",
 
+      ["<C-k>"] = false, -- Clashes with digraph in insert mode
+
       -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
       --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
     },
@@ -938,7 +940,7 @@ do
     -- the rust implementation via `'prefer_rust_with_warning'`
     --
     -- See `:help blink-cmp-config-fuzzy` for more information
-    fuzzy = { implementation = "lua" },
+    fuzzy = { implementation = "prefer_rust" },
 
     -- Shows a signature help window while you type arguments for a function
     signature = { enabled = true },
@@ -959,19 +961,7 @@ do
   vim.pack.add { { src = gh("nvim-treesitter/nvim-treesitter"), version = "main" } }
 
   -- Ensure basic parsers are installed
-  local parsers = {
-    "bash",
-    "c",
-    "diff",
-    "html",
-    "lua",
-    "luadoc",
-    "markdown",
-    "markdown_inline",
-    "query",
-    "vim",
-    "vimdoc",
-  }
+  local parsers = { "bash", "c", "diff", "html", "lua", "luadoc", "markdown", "markdown_inline", "query", "vim", "vimdoc" }
   require("nvim-treesitter").install(parsers)
 
   ---@param buf integer
