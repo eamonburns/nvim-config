@@ -35,8 +35,10 @@ return {
   --       -- Add filetypes
   --       vim.filetype.add { extension = { smd = "supermd" } }
 
-  init = function()
+  config = function()
     -- TODO: Ensure commands are installed (e.g. tree-sitter, curl?)
+    local parsers = { "bash", "c", "diff", "html", "lua", "luadoc", "markdown", "markdown_inline", "query", "vim", "vimdoc" }
+    require("nvim-treesitter").install(parsers)
 
     -- Automatically download parser for current file if available and not already installed
     vim.api.nvim_create_autocmd("FileType", {
