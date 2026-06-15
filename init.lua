@@ -99,7 +99,7 @@ do
   vim.g.maplocalleader = " "
 
   -- Set to true if you have a Nerd Font installed and selected in the terminal
-  vim.g.have_nerd_font = false
+  vim.g.have_nerd_font = (vim.env.TERM_FANCYICONS ~= "0")
 
   -- [[ Setting options ]]
   --  See `:help vim.o`
@@ -118,11 +118,9 @@ do
   -- Don't show the mode, since it's already in the status line
   vim.o.showmode = false
 
-  -- Sync clipboard between OS and Neovim.
-  --  Schedule the setting after `UiEnter` because it can increase startup-time.
-  --  Remove this option if you want your OS clipboard to remain independent.
-  --  See `:help 'clipboard'`
-  vim.schedule(function() vim.o.clipboard = "unnamedplus" end)
+  vim.o.tabstop = 4
+  vim.o.shiftwidth = 4
+  vim.o.expandtab = true
 
   -- Enable break indent
   vim.o.breakindent = true
@@ -165,12 +163,33 @@ do
   vim.o.cursorline = true
 
   -- Minimal number of screen lines to keep above and below the cursor.
-  vim.o.scrolloff = 10
+  vim.o.scrolloff = 3
 
   -- if performing an operation that would fail due to unsaved changes in the buffer (like `:q`),
   -- instead raise a dialog asking if you wish to save the current file(s)
   -- See `:help 'confirm'`
   vim.o.confirm = true
+
+  -- Set shell settings for Windows
+  if vim.fn.has("win32") == 1 then
+    vim.o.shelltemp = false
+    local shellcmdflag = "-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command "
+    shellcmdflag = shellcmdflag .. "[Console]::InputEncoding=[Console]::OutputEncoding=[System.Tex t.UTF8Encoding]::new();"
+    shellcmdflag = shellcmdflag .. "$PSDefaultParameterValues['Out-File:Encoding']='utf8';"
+    vim.o.shellpipe = "> %s 2>&1"
+    vim.o.shellquote = ""
+    vim.o.shellxquote = ""
+
+    if vim.fn.executable("pwsh.exe") == 1 then
+      vim.o.shell = "pwsh.exe"
+      shellcmdflag = shellcmdflag .. "$PSStyle.OutputRendering = 'PlainText';"
+      -- This might be unnecessary
+      vim.env.__SuppressAnsiEscapeSequences = "1"
+    else
+      vim.o.shell = "powershell.exe"
+    end
+    vim.o.shellcmdflag = shellcmdflag
+  end
 end
 
 -- ============================================================
@@ -209,7 +228,30 @@ do
     },
   }
 
-  vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
+  vim.keymap.set("n", "<leader>q", vim.diagnostic.setqflist, {
+    desc = "Open diagnostic [Q]uickfix list",
+  })
+
+  -- Git keymaps
+
+  vim.keymap.set("n", "<leader>gs", function()
+    require("custom.git").run_terminal("status")
+  end, { desc = "Git [s]tatus" })
+  vim.keymap.set("n", "<leader>gl", function()
+    require("custom.git").run_terminal("log --all --graph --oneline --decorate")
+  end, { desc = "Git [l]og" })
+  vim.keymap.set("n", "<leader>gD", function()
+    require("custom.git").run_terminal("diff")
+  end, { desc = "Git [D]iff (all files)" })
+  vim.keymap.set("n", "<leader>gd", function()
+    require("custom.git").run_terminal("diff %")
+  end, { desc = "Git [d]iff (current file)" })
+  vim.keymap.set("n", "<leader>gB", function()
+    require("custom.git").run_terminal("blame %")
+  end, { desc = "Git [B]lame (current file)" })
+  vim.keymap.set("n", "<leader>gb", function()
+    require("custom.git.blame").current_line()
+  end, { desc = "Git [b]lame (current line)" })
 
   -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
   -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -219,26 +261,20 @@ do
   -- or just use <C-\><C-n> to exit terminal mode
   vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
-  -- TIP: Disable arrow keys in normal mode
-  -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
-  -- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
-  -- vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
-  -- vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
+  vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', { desc = "Yank to system clipboard" })
+  vim.keymap.set({ "n", "v" }, "<leader>p", '"+p', { desc = "Put from system clipboard" })
 
-  -- Keybinds to make split navigation easier.
-  --  Use CTRL+<hjkl> to switch between windows
-  --
-  --  See `:help wincmd` for a list of all window commands
-  vim.keymap.set("n", "<C-h>", "<C-w><C-h>", { desc = "Move focus to the left window" })
-  vim.keymap.set("n", "<C-l>", "<C-w><C-l>", { desc = "Move focus to the right window" })
-  vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to the lower window" })
-  vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
+  -- Buffer keymaps
+  vim.keymap.set("n", "L", "<cmd>bnext<cr>", { desc = "Next buffer" })
+  vim.keymap.set("n", "H", "<cmd>bprev<cr>", { desc = "Previous buffer" })
 
-  -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
-  -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
-  -- vim.keymap.set("n", "<C-S-l>", "<C-w>L", { desc = "Move window to the right" })
-  -- vim.keymap.set("n", "<C-S-j>", "<C-w>J", { desc = "Move window to the lower" })
-  -- vim.keymap.set("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
+  -- Disable arrow keys in normal mode (not in Termux)
+  if vim.fn.has("termux") == 0 then
+    vim.keymap.set("n", "<left>", '<cmd>echo "Use h to move!!"<CR>')
+    vim.keymap.set("n", "<right>", '<cmd>echo "Use l to move!!"<CR>')
+    vim.keymap.set("n", "<up>", '<cmd>echo "Use k to move!!"<CR>')
+    vim.keymap.set("n", "<down>", '<cmd>echo "Use j to move!!"<CR>')
+  end
 
   -- [[ Basic Autocommands ]]
   --  See `:help lua-guide-autocommands`
@@ -249,7 +285,9 @@ do
   vim.api.nvim_create_autocmd("TextYankPost", {
     desc = "Highlight when yanking (copying) text",
     group = vim.api.nvim_create_augroup("kickstart-highlight-yank", { clear = true }),
-    callback = function() vim.hl.on_yank() end,
+    callback = function()
+      vim.hl.on_yank()
+    end,
   })
 end
 
@@ -285,7 +323,9 @@ do
       local stderr = result.stderr or ""
       local stdout = result.stdout or ""
       local output = stderr ~= "" and stderr or stdout
-      if output == "" then output = "No output from build command." end
+      if output == "" then
+        output = "No output from build command."
+      end
       vim.notify(("Build failed for %s:\n%s"):format(name, output), vim.log.levels.ERROR)
     end
   end
@@ -298,7 +338,9 @@ do
     callback = function(ev)
       local name = ev.data.spec.name
       local kind = ev.data.kind
-      if kind ~= "install" and kind ~= "update" then return end
+      if kind ~= "install" and kind ~= "update" then
+        return
+      end
 
       if name == "telescope-fzf-native.nvim" and vim.fn.executable("make") == 1 then
         run_build(name, { "make" }, ev.data.path)
@@ -306,12 +348,16 @@ do
       end
 
       if name == "LuaSnip" then
-        if vim.fn.has("win32") ~= 1 and vim.fn.executable("make") == 1 then run_build(name, { "make", "install_jsregexp" }, ev.data.path) end
+        if vim.fn.has("win32") ~= 1 and vim.fn.executable("make") == 1 then
+          run_build(name, { "make", "install_jsregexp" }, ev.data.path)
+        end
         return
       end
 
       if name == "nvim-treesitter" then
-        if not ev.data.active then vim.cmd.packadd("nvim-treesitter") end
+        if not ev.data.active then
+          vim.cmd.packadd("nvim-treesitter")
+        end
         vim.cmd("TSUpdate")
         return
       end
@@ -323,7 +369,9 @@ end
 ---function to have less repetition in the following sections.
 ---@param repo string
 ---@return string
-local function gh(repo) return "https://github.com/" .. repo end
+local function gh(repo)
+  return "https://github.com/" .. repo
+end
 
 -- ============================================================
 -- SECTION 4: UI / CORE UX PLUGINS
@@ -443,7 +491,9 @@ do
   -- default behavior. For example, here we set the section for
   -- cursor location to LINE:COLUMN
   ---@diagnostic disable-next-line: duplicate-set-field
-  statusline.section_location = function() return "%2l:%-2v" end
+  statusline.section_location = function()
+    return "%2l:%-2v"
+  end
 
   -- ... and there is more!
   --  Check out: https://github.com/nvim-mini/mini.nvim
@@ -484,7 +534,9 @@ do
     gh("nvim-telescope/telescope.nvim"),
     gh("nvim-telescope/telescope-ui-select.nvim"),
   }
-  if vim.fn.executable("make") == 1 then table.insert(telescope_plugins, gh("nvim-telescope/telescope-fzf-native.nvim")) end
+  if vim.fn.executable("make") == 1 then
+    table.insert(telescope_plugins, gh("nvim-telescope/telescope-fzf-native.nvim"))
+  end
 
   -- NOTE: You can install multiple plugins at once
   vim.pack.add(telescope_plugins)
@@ -568,20 +620,17 @@ do
 
   -- It's also possible to pass additional configuration options.
   --  See `:help telescope.builtin.live_grep()` for information about particular keys
-  vim.keymap.set(
-    "n",
-    "<leader>s/",
-    function()
-      builtin.live_grep {
-        grep_open_files = true,
-        prompt_title = "Live Grep in Open Files",
-      }
-    end,
-    { desc = "[S]earch [/] in Open Files" }
-  )
+  vim.keymap.set("n", "<leader>s/", function()
+    builtin.live_grep {
+      grep_open_files = true,
+      prompt_title = "Live Grep in Open Files",
+    }
+  end, { desc = "[S]earch [/] in Open Files" })
 
   -- Shortcut for searching your Neovim configuration files
-  vim.keymap.set("n", "<leader>sn", function() builtin.find_files { cwd = vim.fn.stdpath("config"), follow = true } end, { desc = "[S]earch [N]eovim files" })
+  vim.keymap.set("n", "<leader>sn", function()
+    builtin.find_files { cwd = vim.fn.stdpath("config"), follow = true }
+  end, { desc = "[S]earch [N]eovim files" })
 end
 
 -- ============================================================
@@ -682,7 +731,9 @@ do
       --
       -- This may be unwanted, since they displace some of your code
       if client and client:supports_method("textDocument/inlayHint", event.buf) then
-        map("<leader>th", function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf }) end, "[T]oggle Inlay [H]ints")
+        map("<leader>th", function()
+          vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
+        end, "[T]oggle Inlay [H]ints")
       end
     end,
   })
@@ -712,7 +763,9 @@ do
 
         if client.workspace_folders then
           local path = client.workspace_folders[1].name
-          if path ~= vim.fn.stdpath("config") and (vim.uv.fs_stat(path .. "/.luarc.json") or vim.uv.fs_stat(path .. "/.luarc.jsonc")) then return end
+          if path ~= vim.fn.stdpath("config") and (vim.uv.fs_stat(path .. "/.luarc.json") or vim.uv.fs_stat(path .. "/.luarc.jsonc")) then
+            return
+          end
         end
 
         client.config.settings.Lua = vim.tbl_deep_extend("force", client.config.settings.Lua, {
@@ -805,7 +858,9 @@ do
     },
   }
 
-  vim.keymap.set({ "n", "v" }, "<leader>f", function() require("conform").format { async = true } end, { desc = "[F]ormat buffer" })
+  vim.keymap.set({ "n", "v" }, "<leader>f", function()
+    require("conform").format { async = true }
+  end, { desc = "[F]ormat buffer" })
 end
 
 -- ============================================================
@@ -904,14 +959,28 @@ do
   vim.pack.add { { src = gh("nvim-treesitter/nvim-treesitter"), version = "main" } }
 
   -- Ensure basic parsers are installed
-  local parsers = { "bash", "c", "diff", "html", "lua", "luadoc", "markdown", "markdown_inline", "query", "vim", "vimdoc" }
+  local parsers = {
+    "bash",
+    "c",
+    "diff",
+    "html",
+    "lua",
+    "luadoc",
+    "markdown",
+    "markdown_inline",
+    "query",
+    "vim",
+    "vimdoc",
+  }
   require("nvim-treesitter").install(parsers)
 
   ---@param buf integer
   ---@param language string
   local function treesitter_try_attach(buf, language)
     -- Check if a parser exists and load it
-    if not vim.treesitter.language.add(language) then return end
+    if not vim.treesitter.language.add(language) then
+      return
+    end
     -- Enable syntax highlighting and other treesitter features
     vim.treesitter.start(buf, language)
 
@@ -925,7 +994,9 @@ do
     local has_indent_query = vim.treesitter.query.get(language, "indents") ~= nil
 
     -- Enable treesitter based indentation
-    if has_indent_query then vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()" end
+    if has_indent_query then
+      vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+    end
   end
 
   local available_parsers = require("nvim-treesitter").get_available()
@@ -934,7 +1005,9 @@ do
       local buf, filetype = args.buf, args.match
 
       local language = vim.treesitter.language.get_lang(filetype)
-      if not language then return end
+      if not language then
+        return
+      end
 
       local installed_parsers = require("nvim-treesitter").get_installed("parsers")
 
@@ -943,7 +1016,9 @@ do
         treesitter_try_attach(buf, language)
       elseif vim.tbl_contains(available_parsers, language) then
         -- If a parser is available in `nvim-treesitter`, auto-install it and enable it after the installation is done
-        require("nvim-treesitter").install(language):await(function() treesitter_try_attach(buf, language) end)
+        require("nvim-treesitter").install(language):await(function()
+          treesitter_try_attach(buf, language)
+        end)
       else
         -- Try to enable treesitter features in case the parser exists but is not available from `nvim-treesitter`
         treesitter_try_attach(buf, language)
