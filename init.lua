@@ -289,6 +289,16 @@ do
       vim.hl.on_yank()
     end,
   })
+
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = "checkhealth",
+    desc = "Automatically delete checkhealth buffers when hidden",
+    group = vim.api.nvim_create_augroup("kickstart-autodelete-checkhealth", { clear = true }),
+    callback = function(ev)
+      vim.bo[ev.buf].bufhidden = "delete"
+      vim.bo[ev.buf].buflisted = false
+    end,
+  })
 end
 
 -- ============================================================
@@ -376,6 +386,7 @@ end
 -- ============================================================
 -- SECTION 4: UI / CORE UX PLUGINS
 -- guess-indent, gitsigns, which-key, colorscheme, todo-comments, mini modules
+-- + oil.nvim, battery.nvim
 -- ============================================================
 do
   -- [[ Installing and Configuring Plugins ]]
@@ -449,7 +460,10 @@ do
 
   -- [[ mini.nvim ]]
   --  A collection of various small independent plugins/modules
-  vim.pack.add { gh("nvim-mini/mini.nvim") }
+  vim.pack.add {
+    gh("nvim-mini/mini.nvim"),
+    gh("justinhj/battery.nvim"),
+  }
 
   -- If a nerd font is available, load the icons module for pretty icons in various plugins.
   if vim.g.have_nerd_font then
@@ -480,12 +494,44 @@ do
   -- - sr)'  - [S]urround [R]eplace [)] [']
   require("mini.surround").setup()
 
+  -- Tabline that lists open buffers
+  require("mini.tabline").setup {}
+
+  -- Battery info added to statusline
+  require("battery").setup {} ---@diagnostic disable-line: missing-fields
   -- Simple and easy statusline.
   --  You could remove this setup call if you don't like it,
   --  and try some other statusline plugin
   local statusline = require("mini.statusline")
   -- Set `use_icons` to true if you have a Nerd Font
-  statusline.setup { use_icons = vim.g.have_nerd_font }
+  statusline.setup {
+    use_icons = vim.g.have_nerd_font,
+    content = {
+      active = function()
+        local mode, mode_hl = MiniStatusline.section_mode { trunc_width = 120 }
+        local git = MiniStatusline.section_git { trunc_width = 40 }
+        local diff = MiniStatusline.section_diff { trunc_width = 75 }
+        local diagnostics = MiniStatusline.section_diagnostics { trunc_width = 75 }
+        local lsp = MiniStatusline.section_lsp { trunc_width = 75 }
+        local filename = MiniStatusline.section_filename { trunc_width = 140 }
+        local fileinfo = MiniStatusline.section_fileinfo { trunc_width = 120 }
+        local location = MiniStatusline.section_location { trunc_width = 75 }
+        local search = MiniStatusline.section_searchcount { trunc_width = 75 }
+
+        return MiniStatusline.combine_groups {
+          { hl = mode_hl, strings = { mode } },
+          { hl = "MiniStatuslineDevinfo", strings = { git, diff, diagnostics, lsp } },
+          "%<", -- Mark general truncate point
+          { hl = "MiniStatuslineFilename", strings = { filename } },
+          "%=", -- End left alignment
+          { hl = "MiniStatuslineFileinfo", strings = { fileinfo } },
+          -- TODO: Find out if there is a way to simply add a sub-section to this group (i.e. the "battery" section),
+          -- instead of needing to re-implement this whole function
+          { hl = mode_hl, strings = { search, location, require("battery").get_status_line() } },
+        }
+      end,
+    },
+  }
 
   -- You can configure sections in the statusline by overriding their
   -- default behavior. For example, here we set the section for
@@ -497,6 +543,18 @@ do
 
   -- ... and there is more!
   --  Check out: https://github.com/nvim-mini/mini.nvim
+
+  vim.pack.add { gh("stevearc/oil.nvim") } -- NOTE: Depends on mini.icons (as nvim-web-devicons)
+  require("oil").setup {
+    default_file_explorer = true,
+    view_options = {
+      show_hidden = true,
+    },
+  }
+  vim.keymap.set("n", "-", "<cmd>Oil<cr>", { desc = "Open parent directory" })
+  vim.keymap.set("n", "_", function()
+    require("oil.actions").open_cwd.callback()
+  end, { desc = "Open NeoVim's current directory" })
 end
 
 -- ============================================================
@@ -667,6 +725,17 @@ do
   -- Useful status updates for LSP.
   vim.pack.add { gh("j-hui/fidget.nvim") }
   require("fidget").setup {}
+
+  -- Faster loading of LuaLS, and load library types
+  vim.pack.add { gh("folke/lazydev.nvim") }
+  require("lazydev").setup {
+    library = {
+      -- Load luvit types when the `vim.uv` word is found
+      { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+      { path = "${3rd}/busted/library", words = { "describe" } },
+      { path = "${3rd}/luassert/library", words = { "describe" } },
+    },
+  }
 
   --  This function gets run when an LSP attaches to a particular buffer.
   --    That is to say, every time a new file is opened that is associated with
