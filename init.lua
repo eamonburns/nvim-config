@@ -1113,5 +1113,8 @@ do
   -- require 'custom.plugins'
 end
 
+-- Load custom :Pack command
+require("custom.pack_cmd")
+
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
