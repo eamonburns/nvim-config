@@ -746,6 +746,7 @@ do
     -- ts_ls = {},
 
     stylua = {}, -- Used to format Lua code
+    zls = {},
 
     -- Special Lua Config, as recommended by neovim help docs
     lua_ls = {
@@ -827,7 +828,7 @@ do
       -- You can specify filetypes to autoformat on save here:
       local enabled_filetypes = {
         lua = true,
-        -- python = true,
+        zig = true,
       }
       if enabled_filetypes[vim.bo[bufnr].filetype] then
         return { timeout_ms = 500 }
