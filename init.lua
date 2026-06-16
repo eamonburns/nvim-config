@@ -57,6 +57,8 @@ do
   -- Keep signcolumn on by default
   vim.o.signcolumn = "yes"
 
+  vim.o.winborder = "single"
+
   -- Decrease update time
   vim.o.updatetime = 250
 
