@@ -5,7 +5,12 @@ local M = {}
 -- be deleted when hidden, and make it not listed in the buffer list.
 -- And will set the key map `q` to quit the buffer
 function M.run_terminal(sub_cmd)
-  vim.cmd("leftabove vertical terminal git --no-pager " .. sub_cmd)
+  local pager = "--no-pager "
+  if vim.fn.executable("delta") == 1 then
+    -- Use delta if executable
+    pager = "-c core.pager='delta --color-only' "
+  end
+  vim.cmd("leftabove vertical terminal git " .. pager .. sub_cmd)
   vim.bo.bufhidden = "delete"
   vim.bo.buflisted = false
   vim.keymap.set("n", "q", "<cmd>q<cr>", { buffer = true })
