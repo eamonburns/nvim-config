@@ -476,9 +476,6 @@ do
     },
   }
   vim.keymap.set("n", "-", "<cmd>Oil<cr>", { desc = "Open parent directory" })
-  vim.keymap.set("n", "_", function()
-    require("oil.actions").open_cwd.callback()
-  end, { desc = "Open NeoVim's current directory" })
 end
 
 -- ============================================================
