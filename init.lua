@@ -802,7 +802,12 @@ do
   }
 
   -- Automatically install LSPs and related tools to stdpath for Neovim
-  require("mason").setup {}
+  require("mason").setup {
+    registries = {
+      "lua:custom.registry",
+      "github:mason-org/mason-registry",
+    },
+  }
 
   -- Ensure the servers and tools above are installed
   --
