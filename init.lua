@@ -223,6 +223,16 @@ do
       vim.bo[ev.buf].buflisted = false
     end,
   })
+
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = "compile-cmd",
+    callback = function(ev)
+      vim.keymap.set("n", "]]", "<Plug>(CompileNextError)", { buf = ev.buf })
+      vim.keymap.set("n", "[[", "<Plug>(CompilePrevError)", { buf = ev.buf })
+      vim.keymap.set("n", "gf", "<Plug>(CompileGoToErrorFile)", { buf = ev.buf })
+      vim.keymap.set("n", "gF", "<Plug>(CompileGoToErrorFileLine)", { buf = ev.buf })
+    end,
+  })
 end
 
 -- ============================================================
