@@ -7,8 +7,8 @@ local M = {}
 function M.run_terminal(sub_cmd)
   local pager = "--no-pager "
   if vim.fn.executable("delta") == 1 then
-    -- Use delta if executable
-    pager = "-c core.pager='delta --color-only' "
+    -- Use delta if executable, don't paginate output
+    pager = "-c core.pager='delta --color-only --paging never' "
   end
   vim.cmd("leftabove vertical terminal git " .. pager .. sub_cmd)
   vim.bo.bufhidden = "delete"
