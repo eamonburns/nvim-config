@@ -486,6 +486,21 @@ do
     },
   }
   vim.keymap.set("n", "-", "<cmd>Oil<cr>", { desc = "Open parent directory" })
+
+  vim.pack.add { gh("hat0uma/csvview.nvim") }
+  require("csvview").setup()
+
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = { "csv", "tsv" },
+    callback = function(event)
+      vim.keymap.set("n", "<leader>tc", function()
+        vim.cmd.CsvViewToggle()
+      end, {
+        desc = "[T]oggle [C]SV view",
+        buf = event.buf,
+      })
+    end,
+  })
 end
 
 -- ============================================================
