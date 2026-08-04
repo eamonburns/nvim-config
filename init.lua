@@ -786,7 +786,7 @@ do
         end
 
         local current_settings = client.config.settings --[[@as lspconfig.settings.lua_ls]]
-        client.config.settings.Lua = vim.tbl_deep_extend('force', current_settings.Lua, {
+        client.config.settings.Lua = vim.tbl_deep_extend("force", current_settings.Lua, {
           runtime = {
             version = "LuaJIT",
             path = { "lua/?.lua", "lua/?/init.lua" },
@@ -822,7 +822,7 @@ do
   require("mason").setup {}
 
   -- Translates between nvim-lspconfig server names and mason.nvim package names (e.g. lua_ls <-> lua-language-server)
-  require('mason-lspconfig').setup {
+  require("mason-lspconfig").setup {
     automatic_enable = false, -- Change this to true if you want to automatically enable servers that are installed manually (e.g. via :Mason / :MasonInstall)
   }
 
