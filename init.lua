@@ -1,6 +1,6 @@
 -- ============================================================
 -- SECTION 1: OPTIONS
--- Core Neovim settings, leaders, options, basic keymaps, basic autocmds
+-- Core Neovim settings, leaders, options
 -- ============================================================
 do
   -- Enable faster startup by caching compiled Lua modules
@@ -117,8 +117,8 @@ do
 end
 
 -- ============================================================
--- SECTION 2: KEYMAPS
--- basic keymaps
+-- SECTION 2: KEYMAPS & AUTOCMDS
+-- basic keymaps, basic autocmds
 -- ============================================================
 do
   -- [[ Basic Keymaps ]]
@@ -785,7 +785,8 @@ do
           end
         end
 
-        client.config.settings.Lua = vim.tbl_deep_extend("force", client.config.settings.Lua, {
+        local current_settings = client.config.settings --[[@as lspconfig.settings.lua_ls]]
+        client.config.settings.Lua = vim.tbl_deep_extend('force', current_settings.Lua, {
           runtime = {
             version = "LuaJIT",
             path = { "lua/?.lua", "lua/?/init.lua" },
@@ -819,6 +820,11 @@ do
 
   -- Automatically install LSPs and related tools to stdpath for Neovim
   require("mason").setup {}
+
+  -- Translates between nvim-lspconfig server names and mason.nvim package names (e.g. lua_ls <-> lua-language-server)
+  require('mason-lspconfig').setup {
+    automatic_enable = false, -- Change this to true if you want to automatically enable servers that are installed manually (e.g. via :Mason / :MasonInstall)
+  }
 
   -- Ensure the servers and tools above are installed
   --
