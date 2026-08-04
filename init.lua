@@ -771,6 +771,7 @@ do
 
     stylua = {}, -- Used to format Lua code
     zls = {},
+    gopls = {},
 
     -- Special Lua Config, as recommended by neovim help docs
     lua_ls = {
@@ -853,6 +854,7 @@ do
       local enabled_filetypes = {
         lua = true,
         zig = true,
+        go = true,
       }
       if enabled_filetypes[vim.bo[bufnr].filetype] then
         return { timeout_ms = 500 }
