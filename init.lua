@@ -490,6 +490,18 @@ do
   vim.pack.add { gh("hat0uma/csvview.nvim") }
   require("csvview").setup()
 
+  vim.pack.add { gh("brenoprata10/nvim-highlight-colors") }
+  require("nvim-highlight-colors").setup {
+    render = "virtual",
+    virtual_symbol = "██",
+    virtual_symbol_suffix = "",
+  }
+  vim.keymap.set("n", "<leader>tg", function()
+    vim.cmd.HighlightColors("Toggle")
+  end, {
+    desc = "[T]oggle CSS Color Hi[g]hlight",
+  })
+
   vim.api.nvim_create_autocmd("FileType", {
     pattern = { "csv", "tsv" },
     callback = function(event)
