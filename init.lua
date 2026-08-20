@@ -95,25 +95,25 @@ do
   vim.o.confirm = true
 
   -- Set shell settings for Windows
-  if vim.fn.has("win32") == 1 then
-    vim.o.shelltemp = false
-    local shellcmdflag = "-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command "
-    shellcmdflag = shellcmdflag .. "[Console]::InputEncoding=[Console]::OutputEncoding=[System.Tex t.UTF8Encoding]::new();"
-    shellcmdflag = shellcmdflag .. "$PSDefaultParameterValues['Out-File:Encoding']='utf8';"
-    vim.o.shellpipe = "> %s 2>&1"
-    vim.o.shellquote = ""
-    vim.o.shellxquote = ""
-
-    if vim.fn.executable("pwsh.exe") == 1 then
-      vim.o.shell = "pwsh.exe"
-      shellcmdflag = shellcmdflag .. "$PSStyle.OutputRendering = 'PlainText';"
-      -- This might be unnecessary
-      vim.env.__SuppressAnsiEscapeSequences = "1"
-    else
-      vim.o.shell = "powershell.exe"
-    end
-    vim.o.shellcmdflag = shellcmdflag
-  end
+  -- if vim.fn.has("win32") == 1 then
+  --   vim.o.shelltemp = false
+  --   local shellcmdflag = "-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command "
+  --   shellcmdflag = shellcmdflag .. "[Console]::InputEncoding=[Console]::OutputEncoding=[System.Tex t.UTF8Encoding]::new();"
+  --   shellcmdflag = shellcmdflag .. "$PSDefaultParameterValues['Out-File:Encoding']='utf8';"
+  --   vim.o.shellpipe = "> %s 2>&1"
+  --   vim.o.shellquote = ""
+  --   vim.o.shellxquote = ""
+  --
+  --   if vim.fn.executable("pwsh.exe") == 1 then
+  --     vim.o.shell = "pwsh.exe"
+  --     shellcmdflag = shellcmdflag .. "$PSStyle.OutputRendering = 'PlainText';"
+  --     -- This might be unnecessary
+  --     vim.env.__SuppressAnsiEscapeSequences = "1"
+  --   else
+  --     vim.o.shell = "powershell.exe"
+  --   end
+  --   vim.o.shellcmdflag = shellcmdflag
+  -- end
 end
 
 -- ============================================================
@@ -784,6 +784,9 @@ do
     stylua = {}, -- Used to format Lua code
     zls = {},
     gopls = {},
+    powershell_es = {
+      bundle_path = vim.fn.stdpath("data") .. "/mason/packages/powershell-editor-services",
+    },
 
     -- Special Lua Config, as recommended by neovim help docs
     lua_ls = {
@@ -822,6 +825,9 @@ do
       },
     },
   }
+  if vim.fn.has("win32") == 0 then
+    servers.powershell_es = nil
+  end
 
   vim.pack.add {
     gh("neovim/nvim-lspconfig"),
