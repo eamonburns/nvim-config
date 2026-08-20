@@ -983,6 +983,11 @@ do
   }
 end
 
+do
+  vim.pack.add { { src = gh("eamonburns/zine.nvim") } }
+  require("zine").setup()
+end
+
 -- ============================================================
 -- SECTION 9: TREESITTER
 -- Parser installation, syntax highlighting, folds, indentation
