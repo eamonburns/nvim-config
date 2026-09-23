@@ -490,17 +490,17 @@ do
   vim.pack.add { gh("hat0uma/csvview.nvim") }
   require("csvview").setup()
 
-  vim.pack.add { gh("brenoprata10/nvim-highlight-colors") }
-  require("nvim-highlight-colors").setup {
-    render = "virtual",
-    virtual_symbol = "██",
-    virtual_symbol_suffix = "",
-  }
-  vim.keymap.set("n", "<leader>tg", function()
-    vim.cmd.HighlightColors("Toggle")
-  end, {
-    desc = "[T]oggle CSS Color Hi[g]hlight",
-  })
+  -- vim.pack.add { gh("brenoprata10/nvim-highlight-colors") }
+  -- require("nvim-highlight-colors").setup {
+  --   render = "virtual",
+  --   virtual_symbol = "██",
+  --   virtual_symbol_suffix = "",
+  -- }
+  -- vim.keymap.set("n", "<leader>tg", function()
+  --   vim.cmd.HighlightColors("Toggle")
+  -- end, {
+  --   desc = "[T]oggle CSS Color Hi[g]hlight",
+  -- })
 
   vim.api.nvim_create_autocmd("FileType", {
     pattern = { "csv", "tsv" },
@@ -825,8 +825,18 @@ do
       },
     },
   }
+  -- Only use powershell_es on Windows
   if vim.fn.has("win32") == 0 then
     servers.powershell_es = nil
+  end
+  -- metazig integration
+  if vim.fn.executable("mzig") == 1 and vim.fn.executable("mzls") == 1 then
+    servers.zls.cmd = { "mzls" }
+    local zig_exe_path = vim.fn.exepath("mzig")
+    assert(zig_exe_path ~= "", "mzig should be in the path because `executable` succeeded above")
+    servers.zls.settings = {
+      zig_exe_path = zig_exe_path,
+    }
   end
 
   vim.pack.add {
@@ -858,8 +868,8 @@ do
 
   require("mason-tool-installer").setup { ensure_installed = ensure_installed }
 
-  for name, server in pairs(servers) do
-    vim.lsp.config(name, server)
+  for name, config in pairs(servers) do
+    vim.lsp.config(name, config)
     vim.lsp.enable(name)
   end
 end
@@ -990,8 +1000,8 @@ do
 end
 
 do
-  vim.pack.add { { src = gh("eamonburns/zine.nvim") } }
-  require("zine").setup()
+  -- vim.pack.add { { src = gh("eamonburns/zine.nvim") } }
+  -- require("zine").setup()
 end
 
 -- ============================================================
